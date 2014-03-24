@@ -34,7 +34,7 @@ namespace dom {
 
 	class DOMParser: public xml::ExpatBase<DOMParser>
 	{
-		dom::XmlElementPtr elem;
+		ElementPtr elem;
 		std::string text;
 
 		void addText()
@@ -46,11 +46,11 @@ namespace dom {
 		}
 	public:
 
-		dom::XmlDocumentPtr doc;
+		DocumentPtr doc;
 
 		bool create(const char* cp)
 		{
-			doc = dom::XmlDocument::create();
+			doc = Document::create();
 			if (!doc) return false;
 			return xml::ExpatBase<DOMParser>::create(cp);
 		}
@@ -75,8 +75,8 @@ namespace dom {
 		{
 			addText();
 			if (!elem) return;
-			dom::XmlNodePtr node = elem->parentNode();
-			elem = std::static_pointer_cast<dom::XmlElement>(node);
+			NodePtr node = elem->parentNode();
+			elem = std::static_pointer_cast<Element>(node);
 		}
 
 		void onCharacterData(const XML_Char *pszData, int nLength)
@@ -85,7 +85,7 @@ namespace dom {
 		}
 	};
 
-	XmlDocumentPtr XmlDocument::fromFile(const char* path)
+	DocumentPtr Document::fromFile(const char* path)
 	{
 		DOMParser parser;
 		if (!parser.create(nullptr)) return nullptr;
@@ -114,7 +114,7 @@ namespace dom {
 		return parser.doc;
 	}
 
-	void Print(const dom::XmlNodeListPtr& subs, bool ignorews, size_t depth)
+	void Print(const NodeListPtr& subs, bool ignorews, size_t depth)
 	{
 		if (subs)
 		{
@@ -132,9 +132,9 @@ namespace dom {
 		return "{" + qname.nsName + "}" + qname.localName;
 	}
 
-	void Print(const dom::XmlNodePtr& node, bool ignorews, size_t depth)
+	void Print(const NodePtr& node, bool ignorews, size_t depth)
 	{
-		dom::XmlNodeListPtr subs = node->childNodes();
+		NodeListPtr subs = node->childNodes();
 
 		NODE_TYPE type = node->nodeType();
 		std::string out;
@@ -158,22 +158,22 @@ namespace dom {
 		else if (type == ELEMENT_NODE)
 		{
 			std::string sattrs;
-			auto e = std::static_pointer_cast<dom::XmlElement>(node);
-			dom::XmlNodeListPtr attrs;
+			auto e = std::static_pointer_cast<Element>(node);
+			NodeListPtr attrs;
 			if (e) attrs = e->getAttributes();
 			if (attrs)
 			{
 				size_t count = attrs->length();
 				for(size_t i = 0; i < count; ++i)
 				{
-					dom::XmlNodePtr node = attrs->item(i);
+					NodePtr node = attrs->item(i);
 					sattrs += " " + qName(node) + "='" + node->nodeValue() + "'";
 				}
 			}
 
 			if (subs && subs->length() == 1)
 			{
-				dom::XmlNodePtr sub = subs->item(0);
+				NodePtr sub = subs->item(0);
 				if (sub && sub->nodeType() == TEXT_NODE)
 				{
 					out += qName(node);

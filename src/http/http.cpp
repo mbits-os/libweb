@@ -337,7 +337,7 @@ namespace http
 			std::string reason;
 			Headers response_headers;
 			ContentData response;
-			dom::XmlDocumentPtr doc;
+			dom::DocumentPtr doc;
 
 			bool send_flag, done_flag, debug;
 			HttpEndpointPtr m_endpoint;
@@ -408,8 +408,8 @@ namespace http
 			std::map<std::string, std::string> getResponseHeaders() const override;
 			size_t getResponseTextLength() const override;
 			const char* getResponseText() const override;
-			dom::XmlDocumentPtr getResponseXml() override;
-			dom::XmlDocumentPtr getResponseHtml() override;
+			dom::DocumentPtr getResponseXml() override;
+			dom::DocumentPtr getResponseHtml() override;
 
 			bool wasRedirected() const override;
 			const std::string getFinalLocation() const override;
@@ -570,7 +570,7 @@ namespace http
 			return (const char*)response.content;
 		}
 
-		dom::XmlDocumentPtr XmlHttpRequest::getResponseXml()
+		dom::DocumentPtr XmlHttpRequest::getResponseXml()
 		{
 			// Synchronize on (*this);
 
@@ -578,12 +578,12 @@ namespace http
 
 			if (!doc && response.content && response.content_length)
 				if (!rebuildDOM("text/xml"))
-					return dom::XmlDocumentPtr();
+					return dom::DocumentPtr();
 
 			return doc; 
 		}
 
-		dom::XmlDocumentPtr XmlHttpRequest::getResponseHtml()
+		dom::DocumentPtr XmlHttpRequest::getResponseHtml()
 		{
 			// Synchronize on (*this);
 
@@ -591,7 +591,7 @@ namespace http
 
 			if (!doc && response.content && response.content_length)
 				if (!rebuildDOM("text/html"))
-					return dom::XmlDocumentPtr();
+					return dom::DocumentPtr();
 
 			return doc; 
 		}
@@ -745,7 +745,7 @@ namespace http
 
 		class XHRParser: public xml::ExpatBase<XHRParser>
 		{
-			dom::XmlElementPtr elem;
+			dom::ElementPtr elem;
 			std::string text;
 
 			void addText()
@@ -757,11 +757,11 @@ namespace http
 			}
 		public:
 
-			dom::XmlDocumentPtr doc;
+			dom::DocumentPtr doc;
 
 			bool create(const char* cp)
 			{
-				doc = dom::XmlDocument::create();
+				doc = dom::Document::create();
 				if (!doc) return false;
 				return xml::ExpatBase<XHRParser>::create(cp);
 			}
@@ -803,8 +803,8 @@ namespace http
 			{
 				addText();
 				if (!elem) return;
-				dom::XmlNodePtr node = elem->parentNode();
-				elem = std::static_pointer_cast<dom::XmlElement>(node);
+				dom::NodePtr node = elem->parentNode();
+				elem = std::static_pointer_cast<dom::Element>(node);
 			}
 
 			void onCharacterData(const XML_Char *pszData, int nLength)
@@ -950,8 +950,8 @@ namespace http
 
 		class HTMLParser : htmlcxx::HTML::ParserSax
 		{
-			dom::XmlElementPtr elem;
-			dom::XmlDocumentFragmentPtr container;
+			dom::ElementPtr elem;
+			dom::DocumentFragmentPtr container;
 			std::string text;
 			TextConverterPtr converter;
 			std::string conv(const std::string& s) { return converter->conv(s); }
@@ -1044,7 +1044,7 @@ namespace http
 				expandNumericals();
 				expand("&amp;", "&");
 
-				dom::XmlTextPtr node = doc->createTextNode(text);
+				dom::TextPtr node = doc->createTextNode(text);
 				if (node)
 				{
 					if (elem)
@@ -1062,11 +1062,11 @@ namespace http
 			{
 			}
 
-			dom::XmlDocumentPtr doc;
+			dom::DocumentPtr doc;
 
 			bool create(const std::string& cp)
 			{
-				doc = dom::XmlDocument::create();
+				doc = dom::Document::create();
 				if (!doc)
 					return false;
 				container = doc->createDocumentFragment();
@@ -1083,7 +1083,7 @@ namespace http
 				{
 					addText();
 
-					dom::XmlElementPtr current = doc->createElement(nodeName);
+					dom::ElementPtr current = doc->createElement(nodeName);
 					if (!current) return;
 
 					node.parseAttributes();
@@ -1171,7 +1171,7 @@ namespace http
 					return;
 				}
 
-				dom::XmlNodePtr xmlnode = elem;
+				dom::NodePtr xmlnode = elem;
 				while (xmlnode)
 				{
 					if (xmlnode->nodeName() == nodeName)
@@ -1181,13 +1181,13 @@ namespace http
 				}
 
 				if (!xmlnode) return;
-				elem = std::static_pointer_cast<dom::XmlElement>(xmlnode);
+				elem = std::static_pointer_cast<dom::Element>(xmlnode);
 
 				addText();
 
 				if (!elem) return;
 
-				elem = std::static_pointer_cast<dom::XmlElement>(elem->parentNode());
+				elem = std::static_pointer_cast<dom::Element>(elem->parentNode());
 			}
 
 			void foundText(htmlcxx::HTML::Node node) override

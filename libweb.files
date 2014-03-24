@@ -14,6 +14,7 @@ includes/dom/nodes/node.hpp
 includes/dom/nodes/nodelist.hpp
 includes/dom/nodes/text.hpp
 includes/dom/parsers/expat.hpp
+includes/dom/parsers/encoding_db.hpp
 includes/mail/filter.hpp
 includes/mail/mail.hpp
 includes/mail/wiki_mailer.hpp
@@ -37,6 +38,7 @@ src/dom/nodes/nodelist.hpp
 src/dom/nodes/node_impl.hpp
 src/dom/nodes/parent_node_impl.hpp
 src/dom/nodes/text.hpp
+src/dom/parsers/encoding_db.cpp
 src/mail/mail.cpp
 src/mail/filter.cpp
 src/mail/wiki_mailer.cpp

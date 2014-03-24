@@ -108,9 +108,6 @@ namespace http
 		virtual void setShouldFollowLocation(bool follow) = 0;
 		virtual void setMaxRedirects(size_t redirects) = 0;
 	};
-
-	void init(const filesystem::path& charsetPath);
-	void reload(const filesystem::path& charsetPath);
 }
 
 #endif //__HTTP_HPP__

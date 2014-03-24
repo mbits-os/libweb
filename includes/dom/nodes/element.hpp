@@ -22,23 +22,28 @@
  * SOFTWARE.
  */
 
-#ifndef __DOM_HPP__
-#define __DOM_HPP__
+#ifndef __DOM_ELEMENT_HPP__
+#define __DOM_ELEMENT_HPP__
 
-#include <dom/domfwd.hpp>
 #include <dom/nodes/node.hpp>
-#include <dom/nodes/document.hpp>
-#include <dom/nodes/document_fragment.hpp>
-#include <dom/nodes/nodelist.hpp>
-#include <dom/nodes/element.hpp>
-#include <dom/nodes/attribute.hpp>
-#include <dom/nodes/text.hpp>
-#include <dom/range.hpp>
 
 namespace dom
 {
-	void Print(const XmlNodePtr& node, bool ignorews = false, size_t depth = 0);
-	void Print(const XmlNodeListPtr& subs, bool ignorews = false, size_t depth = 0);
+	struct XmlElement : XmlParentNode
+	{
+		virtual std::string tagName() const { return nodeName(); }
+		virtual std::string stringValue() override { return innerText(); }
+		virtual std::string getAttribute(const std::string& name) = 0;
+		virtual XmlAttributePtr getAttributeNode(const std::string& name) = 0;
+		virtual bool setAttribute(const XmlAttributePtr& attr) = 0;
+		virtual bool removeAttribute(const XmlAttributePtr& attr) = 0;
+		virtual bool setAttribute(const std::string& attr, const std::string& value) = 0;
+		virtual bool removeAttribute(const std::string& attr) = 0;
+		virtual XmlNodeListPtr getAttributes() = 0;
+		virtual bool hasAttribute(const std::string& name) = 0;
+		virtual XmlNodeListPtr getElementsByTagName(const std::string& tagName) = 0;
+		virtual std::string innerText() = 0;
+	};
 }
 
-#endif // __DOM_HPP__
+#endif // __DOM_ELEMENT_HPP__

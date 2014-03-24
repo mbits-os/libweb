@@ -22,23 +22,23 @@
  * SOFTWARE.
  */
 
-#ifndef __DOM_HPP__
-#define __DOM_HPP__
+#ifndef __DOM_ATTRIBUTE_HPP__
+#define __DOM_ATTRIBUTE_HPP__
 
-#include <dom/domfwd.hpp>
 #include <dom/nodes/node.hpp>
-#include <dom/nodes/document.hpp>
-#include <dom/nodes/document_fragment.hpp>
-#include <dom/nodes/nodelist.hpp>
-#include <dom/nodes/element.hpp>
-#include <dom/nodes/attribute.hpp>
-#include <dom/nodes/text.hpp>
-#include <dom/range.hpp>
 
 namespace dom
 {
-	void Print(const XmlNodePtr& node, bool ignorews = false, size_t depth = 0);
-	void Print(const XmlNodeListPtr& subs, bool ignorews = false, size_t depth = 0);
+	struct XmlAttribute: XmlNode
+	{
+		virtual std::string name() const { return nodeName(); }
+		virtual std::string value() const { return nodeValue(); }
+		virtual void value(const std::string& val) { nodeValue(val); }
+		virtual XmlElementPtr ownerElement()
+		{
+			return std::static_pointer_cast<XmlElement>(parentNode());
+		}
+	};
 }
 
-#endif // __DOM_HPP__
+#endif // __DOM_ATTRIBUTE_HPP__

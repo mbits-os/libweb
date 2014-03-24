@@ -22,23 +22,41 @@
  * SOFTWARE.
  */
 
-#ifndef __DOM_HPP__
-#define __DOM_HPP__
+#ifndef __DOM_NODELIST_HPP__
+#define __DOM_NODELIST_HPP__
 
-#include <dom/domfwd.hpp>
 #include <dom/nodes/node.hpp>
-#include <dom/nodes/document.hpp>
-#include <dom/nodes/document_fragment.hpp>
-#include <dom/nodes/nodelist.hpp>
-#include <dom/nodes/element.hpp>
-#include <dom/nodes/attribute.hpp>
-#include <dom/nodes/text.hpp>
-#include <dom/range.hpp>
 
 namespace dom
 {
-	void Print(const XmlNodePtr& node, bool ignorews = false, size_t depth = 0);
-	void Print(const XmlNodeListPtr& subs, bool ignorews = false, size_t depth = 0);
+	struct XmlNodeList
+	{
+		virtual ~XmlNodeList() {}
+		virtual XmlNodePtr item(size_t index) = 0;
+		XmlElementPtr element(size_t index)
+		{
+			XmlNodePtr i = item(index);
+			if (i && i->nodeType() == ELEMENT_NODE)
+				return std::static_pointer_cast<XmlElement>(i);
+			return XmlElementPtr();
+		}
+		XmlTextPtr text(size_t index)
+		{
+			XmlNodePtr i = item(index);
+			if (i && i->nodeType() == TEXT_NODE)
+				return std::static_pointer_cast<XmlText>(i);
+			return XmlTextPtr();
+		}
+		XmlAttributePtr attr(size_t index)
+		{
+			XmlNodePtr i = item(index);
+			if (i && i->nodeType() == ATTRIBUTE_NODE)
+				return std::static_pointer_cast<XmlAttribute>(i);
+			return nullptr;
+		}
+		virtual size_t length() const = 0;
+		virtual bool remove() = 0;
+	};
 }
 
-#endif // __DOM_HPP__
+#endif // __DOM_NODELIST_HPP__

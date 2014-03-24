@@ -449,4 +449,81 @@ namespace dom { namespace parsers { namespace html {
 		}
 	}
 
+	void serializeChildren(OutStream& stream, const NodePtr& node)
+	{
+		for (auto&& child : list_nodes(node->childNodes()))
+			serialize(stream, child);
+	}
+
+	static const char* closed[] = {
+		"area",
+		"base",
+		"basefont",
+		"br",
+		"col",
+		"frame",
+		"hr",
+		"img",
+		"input",
+		"isindex",
+		"link",
+		"meta",
+		"param",
+		"nextid",
+		"bgsound",
+		"embed",
+		"keygen",
+		"spacer",
+		"wbr"
+	};
+
+	void serializeElement(OutStream& stream, const ElementPtr& e)
+	{
+		auto tag = std::tolower(e->tagName());
+
+		stream << '<' << tag;
+
+		for (auto&& att : dom::list_atts(e->getAttributes()))
+		{
+			if (!att) continue;
+
+			stream << ' '<< std::tolower(att->name()) << "=\"" << url::htmlQuotes(att->value()) << '"';
+		}
+
+		for (auto&& name : closed)
+		{
+			if (tag == name)
+			{
+				stream << "/>";
+				return;
+			}
+		}
+
+		stream << '>';
+		serializeChildren(stream, e);
+		stream << "</" << tag << '>';
+	}
+
+	void serializeText(OutStream& stream, const TextPtr& t)
+	{
+		stream << url::htmlQuotes(t->data());
+	}
+
+	void serialize(OutStream& stream, const dom::NodePtr& node)
+	{
+		if (!node)
+			return;
+
+		auto type = node->nodeType();
+		switch (type)
+		{
+		case dom::TEXT_NODE:
+			return serializeText(stream, std::static_pointer_cast<dom::Text>(node));
+		case dom::ELEMENT_NODE:
+			return serializeElement(stream, std::static_pointer_cast<dom::Element>(node));
+		}
+
+		serializeChildren(stream, node);
+	}
+
 }}}

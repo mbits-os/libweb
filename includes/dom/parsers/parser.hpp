@@ -51,7 +51,21 @@ namespace dom { namespace parsers {
 
 		return parser->onFinish();
 	}
-}
-}
+
+	struct OutStream
+	{
+		virtual ~OutStream() {}
+		virtual void putc(char c) = 0;
+		virtual void puts(const char* s, size_t length) = 0;
+		void puts(const std::string& s) { puts(s.c_str(), s.length()); }
+		template <size_t length>
+		void puts(char (&s)[length]) { puts(s, length); }
+
+		OutStream& operator<<(char c) { putc(c); return *this; }
+		OutStream& operator<<(const std::string& s) { puts(s); return *this; }
+		template <size_t length>
+		OutStream& operator<<(char (&s)[length]) { puts(s); return *this; }
+	};
+}}
 
 #endif // __DOM_PARSERS_PARSER_HPP__

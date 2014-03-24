@@ -44,6 +44,8 @@ namespace dom { namespace parsers { namespace html {
 
 		return parser->onFinish();
 	}
+
+	void serialize(OutStream& stream, const NodePtr& node);
 }}}
 
 #endif // __DOM_PARSERS_HTML_HPP__

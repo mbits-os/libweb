@@ -25,93 +25,33 @@
 #include "pch.h"
 #include <dom/dom.hpp>
 #include <dom/dom_xpath.hpp>
+#include <dom/parsers/xml.hpp>
+#include <dom/parsers/html.hpp>
 #include <vector>
 #include <iterator>
 #include <string.h>
-#include <dom/parsers/expat.hpp>
 
 namespace dom {
 
-	class DOMParser: public xml::ExpatBase<DOMParser>
+	DocumentPtr Document::fromFile(const filesystem::path& path)
 	{
-		ElementPtr elem;
-		std::string text;
-
-		void addText()
+		auto parser = parsers::xml::create(std::string());
+		if (parser)
 		{
-			if (text.empty()) return;
-			if (elem)
-				elem->appendChild(doc->createTextNode(text));
-			text.clear();
-		}
-	public:
-
-		DocumentPtr doc;
-
-		bool create(const char* cp)
-		{
-			doc = Document::create();
-			if (!doc) return false;
-			return xml::ExpatBase<DOMParser>::create(cp);
+			auto doc = parsers::parseFile(parser, path);
+			if (doc)
+				return doc;
 		}
 
-		void onStartElement(const XML_Char *name, const XML_Char **attrs)
+		parser = parsers::html::create(std::string());
+		if (parser)
 		{
-			addText();
-			auto current = doc->createElement(name);
-			if (!current) return;
-
-			for (; *attrs; attrs += 2)
-				current->setAttribute(attrs[0], attrs[1]);
-
-			if (elem)
-				elem->appendChild(current);
-			else
-				doc->setDocumentElement(current);
-			elem = current;
+			auto doc = parsers::parseFile(parser, path);
+			if (doc)
+				return doc;
 		}
 
-		void onEndElement(const XML_Char *name)
-		{
-			addText();
-			if (!elem) return;
-			NodePtr node = elem->parentNode();
-			elem = std::static_pointer_cast<Element>(node);
-		}
-
-		void onCharacterData(const XML_Char *pszData, int nLength)
-		{
-			text += std::string(pszData, nLength);
-		}
-	};
-
-	DocumentPtr Document::fromFile(const char* path)
-	{
-		DOMParser parser;
-		if (!parser.create(nullptr)) return nullptr;
-		parser.enableElementHandler();
-		parser.enableCharacterDataHandler();
-
-		FILE* f = fopen(path, "rb");
-		if (!f)
-			return nullptr;
-
-		char buffer[8192];
-		size_t read;
-		while ((read = fread(buffer, 1, sizeof(buffer), f)) > 0)
-		{
-			if (!parser.parse(buffer, read, false))
-			{
-				fclose(f);
-				return nullptr;
-			}
-		}
-		fclose(f);
-
-		if (!parser.parse(buffer, 0))
-			return nullptr;
-
-		return parser.doc;
+		return nullptr;
 	}
 
 	void Print(const NodeListPtr& subs, bool ignorews, size_t depth)

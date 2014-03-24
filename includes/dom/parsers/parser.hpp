@@ -22,32 +22,36 @@
  * SOFTWARE.
  */
 
-#ifndef __DOM_DOCUMENT_HPP__
-#define __DOM_DOCUMENT_HPP__
+#ifndef __DOM_PARSERS_PARSER_HPP__
+#define __DOM_PARSERS_PARSER_HPP__
 
-#include <dom/nodes/node.hpp>
 #include <filesystem.hpp>
+#include <dom/nodes/document.hpp>
 
-namespace dom
-{
-	struct Document : Node
+namespace dom { namespace parsers {
+
+	struct Parser
 	{
-		static DocumentPtr create();
-		static DocumentPtr fromFile(const filesystem::path& path);
-
-		virtual ElementPtr documentElement() = 0;
-		virtual void setDocumentElement(const ElementPtr& elem) = 0;
-		virtual DocumentFragmentPtr associatedFragment() = 0;
-		virtual void setFragment(const DocumentFragmentPtr& fragment) = 0;
-
-		virtual ElementPtr createElement(const std::string& tagName) = 0;
-		virtual TextPtr createTextNode(const std::string& data) = 0;
-		virtual AttributePtr createAttribute(const std::string& name, const std::string& value) = 0;
-		virtual DocumentFragmentPtr createDocumentFragment() = 0;
-
-		virtual NodeListPtr getElementsByTagName(const std::string& tagName) = 0;
-		virtual ElementPtr getElementById(const std::string& elementId) = 0;
+		virtual ~Parser() {};
+		virtual bool supportsChunks() const = 0;
+		virtual bool onData(const void* data, size_t length) = 0;
+		virtual DocumentPtr onFinish() = 0;
 	};
+	using ParserPtr = std::shared_ptr<Parser>;
+
+	DocumentPtr parseFile(const ParserPtr& parser, const filesystem::path& path);
+
+	static inline DocumentPtr parseDocument(const ParserPtr& parser, const void* data, size_t size)
+	{
+		if (!parser)
+			return nullptr;
+
+		if (!parser->onData(data, size))
+			return nullptr;
+
+		return parser->onFinish();
+	}
+}
 }
 
-#endif // __DOM_DOCUMENT_HPP__
+#endif // __DOM_PARSERS_PARSER_HPP__

@@ -13,8 +13,10 @@ includes/dom/nodes/element.hpp
 includes/dom/nodes/node.hpp
 includes/dom/nodes/nodelist.hpp
 includes/dom/nodes/text.hpp
-includes/dom/parsers/expat.hpp
 includes/dom/parsers/encoding_db.hpp
+includes/dom/parsers/html.hpp
+includes/dom/parsers/parser.hpp
+includes/dom/parsers/xml.hpp
 includes/mail/filter.hpp
 includes/mail/mail.hpp
 includes/mail/wiki_mailer.hpp
@@ -39,6 +41,10 @@ src/dom/nodes/node_impl.hpp
 src/dom/nodes/parent_node_impl.hpp
 src/dom/nodes/text.hpp
 src/dom/parsers/encoding_db.cpp
+src/dom/parsers/expat.hpp
+src/dom/parsers/parser.cpp
+src/dom/parsers/xml_parser.cpp
+src/dom/parsers/html_parser.cpp
 src/mail/mail.cpp
 src/mail/filter.cpp
 src/mail/wiki_mailer.cpp

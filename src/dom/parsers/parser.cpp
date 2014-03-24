@@ -22,32 +22,51 @@
  * SOFTWARE.
  */
 
-#ifndef __DOM_DOCUMENT_HPP__
-#define __DOM_DOCUMENT_HPP__
+#include "pch.h"
+#include <dom/parsers/parser.hpp>
+namespace dom { namespace parsers {
 
-#include <dom/nodes/node.hpp>
-#include <filesystem.hpp>
-
-namespace dom
-{
-	struct Document : Node
+	DocumentPtr parseFile(const ParserPtr& parser, const filesystem::path& path)
 	{
-		static DocumentPtr create();
-		static DocumentPtr fromFile(const filesystem::path& path);
+		if (!parser)
+			return nullptr;
 
-		virtual ElementPtr documentElement() = 0;
-		virtual void setDocumentElement(const ElementPtr& elem) = 0;
-		virtual DocumentFragmentPtr associatedFragment() = 0;
-		virtual void setFragment(const DocumentFragmentPtr& fragment) = 0;
+		FILE* f = fopen(path.native().c_str(), "rb");
+		if (!f)
+			return nullptr;
 
-		virtual ElementPtr createElement(const std::string& tagName) = 0;
-		virtual TextPtr createTextNode(const std::string& data) = 0;
-		virtual AttributePtr createAttribute(const std::string& name, const std::string& value) = 0;
-		virtual DocumentFragmentPtr createDocumentFragment() = 0;
+		if (!parser->supportsChunks())
+		{
+			size_t length = filesystem::file_size(path);
+			char * contents = (char*)malloc(length);
+			if (!contents)
+				return nullptr;
 
-		virtual NodeListPtr getElementsByTagName(const std::string& tagName) = 0;
-		virtual ElementPtr getElementById(const std::string& elementId) = 0;
-	};
-}
+			size_t read = fread(contents, 1, length, f);
+			fclose(f);
 
-#endif // __DOM_DOCUMENT_HPP__
+			if (!parser->onData(contents, length))
+			{
+				free(contents);
+				return nullptr;
+			}
+
+			free(contents);
+			return parser->onFinish();
+		}
+
+		char buffer[8192];
+		size_t read;
+		while ((read = fread(buffer, 1, sizeof(buffer), f)) > 0)
+		{
+			if (!parser->onData(buffer, read))
+			{
+				fclose(f);
+				return nullptr;
+			}
+		}
+		fclose(f);
+
+		return parser->onFinish();
+	}
+}}

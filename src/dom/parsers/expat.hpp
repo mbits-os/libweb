@@ -2,6 +2,7 @@
 #define __EXPAT_HPP__
 
 #include <expat.h>
+#include <string.h>
 
 #define USER_DATA static_cast<Final*>(userData)
 

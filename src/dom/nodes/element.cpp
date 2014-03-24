@@ -24,6 +24,7 @@
 
 #include "pch.h"
 #include "element.hpp"
+#include <string.h>
 
 namespace dom { namespace impl {
 
@@ -92,7 +93,7 @@ namespace dom { namespace impl {
 
 	struct get_1 {
 		template<typename K, typename V>
-		const V& Element::operator()(const std::pair<K, V>& _item) { return _item.second; }
+		const V& operator()(const std::pair<K, V>& _item) { return _item.second; }
 	};
 
 	dom::NodeListPtr Element::getAttributes()

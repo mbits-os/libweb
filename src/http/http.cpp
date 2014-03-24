@@ -39,7 +39,7 @@
 
 #include <string>
 #include "curl_http.hpp"
-#include <dom/expat.hpp>
+#include <dom/parsers/expat.hpp>
 #include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>

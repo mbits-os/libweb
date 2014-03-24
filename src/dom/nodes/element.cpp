@@ -31,27 +31,27 @@ namespace dom { namespace impl {
 
 	std::string Element::getAttribute(const std::string& name)
 	{
-		std::map< std::string, dom::XmlAttributePtr >::const_iterator
+		std::map< std::string, dom::AttributePtr >::const_iterator
 			_it = lookup.find(name);
 		if (_it == lookup.end()) return std::string();
 		return _it->second->value();
 	}
 
-	dom::XmlAttributePtr Element::getAttributeNode(const std::string& name)
+	dom::AttributePtr Element::getAttributeNode(const std::string& name)
 	{
-		std::map< std::string, dom::XmlAttributePtr >::const_iterator
+		std::map< std::string, dom::AttributePtr >::const_iterator
 			_it = lookup.find(name);
-		if (_it == lookup.end()) return dom::XmlAttributePtr();
+		if (_it == lookup.end()) return dom::AttributePtr();
 		return _it->second;
 	}
 
-	bool Element::setAttribute(const dom::XmlAttributePtr& attr)
+	bool Element::setAttribute(const dom::AttributePtr& attr)
 	{
 		NodeImplInit* p = (NodeImplInit*)attr->internalData();
 		if (p)
 			p->parent = shared_from_this();
 
-		std::map< std::string, dom::XmlAttributePtr >::const_iterator
+		std::map< std::string, dom::AttributePtr >::const_iterator
 			_it = lookup.find(attr->name());
 		if (_it != lookup.end())
 		{
@@ -62,7 +62,7 @@ namespace dom { namespace impl {
 		return true;
 	}
 
-	bool Element::removeAttribute(const XmlAttributePtr& attr)
+	bool Element::removeAttribute(const AttributePtr& attr)
 	{
 		if (!attr)
 			return false;
@@ -95,7 +95,7 @@ namespace dom { namespace impl {
 		const V& Element::operator()(const std::pair<K, V>& _item) { return _item.second; }
 	};
 
-	dom::XmlNodeListPtr Element::getAttributes()
+	dom::NodeListPtr Element::getAttributes()
 	{
 		NodePtrs out;
 		out.reserve(lookup.size());
@@ -105,7 +105,7 @@ namespace dom { namespace impl {
 
 	bool Element::hasAttribute(const std::string& name)
 	{
-		std::map< std::string, dom::XmlAttributePtr >::const_iterator
+		std::map< std::string, dom::AttributePtr >::const_iterator
 			_it = lookup.find(name);
 		return _it != lookup.end();
 	}
@@ -121,24 +121,24 @@ namespace dom { namespace impl {
 		}
 	}
 
-	dom::XmlNodeListPtr Element::getElementsByTagName(const std::string& tagName)
+	dom::NodeListPtr Element::getElementsByTagName(const std::string& tagName)
 	{
 		NodePtrs out;
 		enumTagNames(tagName, out);
 		return std::make_shared<NodeList>(out);
 	}
 
-	bool Element::appendAttr(const dom::XmlNodePtr& newChild)
+	bool Element::appendAttr(const dom::NodePtr& newChild)
 	{
 		if (!newChild || newChild->nodeType() != dom::ATTRIBUTE_NODE)
 			return false;
-		return setAttribute(std::static_pointer_cast<dom::XmlAttribute>(newChild));
+		return setAttribute(std::static_pointer_cast<dom::Attribute>(newChild));
 	}
-	bool Element::removeAttr(const dom::XmlNodePtr& child)
+	bool Element::removeAttr(const dom::NodePtr& child)
 	{
 		if (!child || child->nodeType() != dom::ATTRIBUTE_NODE)
 			return false;
-		return removeAttribute(std::static_pointer_cast<dom::XmlAttribute>(child));
+		return removeAttribute(std::static_pointer_cast<dom::Attribute>(child));
 	}
 
 	std::string Element::innerText()
@@ -156,7 +156,7 @@ namespace dom { namespace impl {
 			{
 				case TEXT_NODE: out += node->nodeValue(); break;
 				case ELEMENT_NODE:
-					out += std::static_pointer_cast<dom::XmlElement>(node)->innerText();
+					out += std::static_pointer_cast<dom::Element>(node)->innerText();
 					break;
 			};
 		}
@@ -166,7 +166,7 @@ namespace dom { namespace impl {
 
 	void Element::fixQName(bool forElem)
 	{
-		NodeImpl<Element, dom::XmlElement>::fixQName(forElem);
+		NodeImpl<Element, dom::Element>::fixQName(forElem);
 		if (!forElem) return;
 		for (auto&& pair : lookup)
 		{
@@ -202,6 +202,6 @@ namespace dom { namespace impl {
 			qname.localName = localName;
 			return;
 		}
-		NodeImpl<Element, dom::XmlElement>::fixQName(qname, ns, localName);
+		NodeImpl<Element, dom::Element>::fixQName(qname, ns, localName);
 	}
 }}

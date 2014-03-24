@@ -29,7 +29,7 @@
 
 namespace dom { namespace impl {
 
-	class Text : public ChildNodeImpl<Text, dom::XmlText>
+	class Text : public ChildNodeImpl<Text, dom::Text>
 	{
 	public:
 		Text(const Init& init) : ChildNodeImpl(init) {}

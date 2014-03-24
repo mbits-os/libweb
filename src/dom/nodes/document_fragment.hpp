@@ -29,13 +29,13 @@
 
 namespace dom { namespace impl {
 
-	class DocumentFragment : public ParentNodeImpl<DocumentFragment, dom::XmlDocumentFragment>
+	class DocumentFragment : public ParentNodeImpl<DocumentFragment, dom::DocumentFragment>
 	{
 		void enumTagNames(const std::string& tagName, NodePtrs& out);
 
 	public:
 		DocumentFragment(const Init& init);
-		dom::XmlNodeListPtr getElementsByTagName(const std::string& tagName) override;
+		dom::NodeListPtr getElementsByTagName(const std::string& tagName) override;
 	};
 }}
 

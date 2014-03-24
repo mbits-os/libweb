@@ -29,27 +29,27 @@
 
 namespace dom { namespace impl {
 
-	class Element : public ParentNodeImpl<Element, dom::XmlElement>
+	class Element : public ParentNodeImpl<Element, dom::Element>
 	{
 		typedef std::map< std::string, std::string > InternalNamespaces;
 		InternalNamespaces namespaces;
-		std::map< std::string, dom::XmlAttributePtr > lookup;
+		std::map< std::string, dom::AttributePtr > lookup;
 		bool nsRebuilt;
 	public:
 		Element(const Init& init);
 
 		std::string getAttribute(const std::string& name) override;
-		dom::XmlAttributePtr getAttributeNode(const std::string& name) override;
-		bool setAttribute(const dom::XmlAttributePtr& attr) override;
-		bool removeAttribute(const XmlAttributePtr& attr) override;
+		dom::AttributePtr getAttributeNode(const std::string& name) override;
+		bool setAttribute(const dom::AttributePtr& attr) override;
+		bool removeAttribute(const AttributePtr& attr) override;
 		bool setAttribute(const std::string& attr, const std::string& value) override;
 		bool removeAttribute(const std::string& attr) override;
-		dom::XmlNodeListPtr getAttributes() override;
+		dom::NodeListPtr getAttributes() override;
 		bool hasAttribute(const std::string& name) override;
 		void enumTagNames(const std::string& tagName, NodePtrs& out);
-		dom::XmlNodeListPtr getElementsByTagName(const std::string& tagName) override;
-		bool appendAttr(const dom::XmlNodePtr& newChild);
-		bool removeAttr(const dom::XmlNodePtr& child);
+		dom::NodeListPtr getElementsByTagName(const std::string& tagName) override;
+		bool appendAttr(const dom::NodePtr& newChild);
+		bool removeAttr(const dom::NodePtr& child);
 		std::string innerText() override;
 		void fixQName(bool forElem = true) override;
 		void fixQName(QName& qname, const std::string& ns, const std::string& localName) override;

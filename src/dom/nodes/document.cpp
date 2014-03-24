@@ -36,7 +36,7 @@ namespace dom { namespace impl {
 		m_qname.localName = "#document";
 	}
 
-	XmlNodeListPtr Document::childNodes()
+	NodeListPtr Document::childNodes()
 	{
 		if (fragment)
 			return fragment->childNodes();
@@ -52,7 +52,7 @@ namespace dom { namespace impl {
 		catch (std::bad_alloc) { return nullptr; }
 	}
 
-	void Document::setDocumentElement(const dom::XmlElementPtr& elem)
+	void Document::setDocumentElement(const dom::ElementPtr& elem)
 	{
 		root = elem;
 		fragment = nullptr;
@@ -60,14 +60,14 @@ namespace dom { namespace impl {
 			((NodeImplInit*)elem->internalData())->fixQName();
 	}
 
-	void Document::setFragment(const XmlDocumentFragmentPtr& f)
+	void Document::setFragment(const DocumentFragmentPtr& f)
 	{
 		root = nullptr;
 		fragment = f;
 		if (f)
 			((NodeImplInit*)f->internalData())->fixQName();
 	}
-	dom::XmlElementPtr Document::createElement(const std::string& tagName)
+	dom::ElementPtr Document::createElement(const std::string& tagName)
 	{
 		NodeImplInit init;
 		init.type = ELEMENT_NODE;
@@ -78,7 +78,7 @@ namespace dom { namespace impl {
 		return std::make_shared<Element>(init);
 	}
 
-	dom::XmlTextPtr Document::createTextNode(const std::string& data)
+	dom::TextPtr Document::createTextNode(const std::string& data)
 	{
 		NodeImplInit init;
 		init.type = TEXT_NODE;
@@ -89,7 +89,7 @@ namespace dom { namespace impl {
 		return std::make_shared<Text>(init);
 	}
 
-	dom::XmlAttributePtr Document::createAttribute(const std::string& name, const std::string& value)
+	dom::AttributePtr Document::createAttribute(const std::string& name, const std::string& value)
 	{
 		NodeImplInit init;
 		init.type = ATTRIBUTE_NODE;
@@ -100,7 +100,7 @@ namespace dom { namespace impl {
 		return std::make_shared<Attribute>(init);
 	}
 
-	dom::XmlDocumentFragmentPtr Document::createDocumentFragment()
+	dom::DocumentFragmentPtr Document::createDocumentFragment()
 	{
 		NodeImplInit init;
 		init.type = DOCUMENT_FRAGMENT_NODE;
@@ -110,7 +110,7 @@ namespace dom { namespace impl {
 		return std::make_shared<DocumentFragment>(init);
 	}
 
-	dom::XmlNodeListPtr Document::getElementsByTagName(const std::string& tagName)
+	dom::NodeListPtr Document::getElementsByTagName(const std::string& tagName)
 	{
 		if (root)
 			return root->getElementsByTagName(tagName);
@@ -119,24 +119,24 @@ namespace dom { namespace impl {
 		return nullptr;
 	}
 
-	dom::XmlElementPtr Document::getElementById(const std::string& elementId)
+	dom::ElementPtr Document::getElementById(const std::string& elementId)
 	{
 		return nullptr;
 	}
 
-	XmlNodePtr Document::find(const std::string& path, const Namespaces& ns)
+	NodePtr Document::find(const std::string& path, const Namespaces& ns)
 	{
 		return xpath::XPath(path, ns).find(shared_from_this());
 	}
 
-	XmlNodeListPtr Document::findall(const std::string& path, const Namespaces& ns)
+	NodeListPtr Document::findall(const std::string& path, const Namespaces& ns)
 	{
 		return xpath::XPath(path, ns).findall(shared_from_this());
 	}
 }}
 
 namespace dom {
-	XmlDocumentPtr XmlDocument::create()
+	DocumentPtr Document::create()
 	{
 		return std::make_shared<impl::Document>();
 	}

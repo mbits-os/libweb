@@ -31,7 +31,7 @@
 
 namespace dom { namespace impl {
 
-	static inline XmlNodePtr createTextSibling(XmlNode* node, const std::string& data)
+	static inline NodePtr createTextSibling(Node* node, const std::string& data)
 	{
 		if (!node) return nullptr;
 		auto doc = node->ownerDocument();
@@ -39,7 +39,7 @@ namespace dom { namespace impl {
 		return doc->createTextNode(data);
 	}
 
-	static inline bool removeFromParent(const XmlNodePtr& node)
+	static inline bool removeFromParent(const NodePtr& node)
 	{
 		if (!node)
 			return false;
@@ -54,8 +54,8 @@ namespace dom { namespace impl {
 		NODE_TYPE type;
 		std::string _name, _value;
 		NodePtrs children;
-		std::weak_ptr<dom::XmlDocument> document;
-		std::weak_ptr<dom::XmlNode> parent;
+		std::weak_ptr<dom::Document> document;
+		std::weak_ptr<dom::Node> parent;
 		size_t index = (size_t)-1;
 		QName qname;
 
@@ -71,7 +71,7 @@ namespace dom { namespace impl {
 
 		virtual void fixQName(QName& qname, const std::string& ns, const std::string& localName)
 		{
-			dom::XmlNodePtr parent = this->parent.lock();
+			dom::NodePtr parent = this->parent.lock();
 			if (!parent) return;
 			NodeImplInit* p = (NodeImplInit*)parent->internalData();
 			if (!p) return;
@@ -103,8 +103,8 @@ namespace dom { namespace impl {
 
 		NODE_TYPE nodeType() const override { return type; }
 
-		dom::XmlNodePtr parentNode() override { return parent.lock(); }
-		dom::XmlNodeListPtr childNodes() override
+		dom::NodePtr parentNode() override { return parent.lock(); }
+		dom::NodeListPtr childNodes() override
 		{
 			try {
 				return std::make_shared<NodeList>(children);
@@ -112,47 +112,47 @@ namespace dom { namespace impl {
 			catch (std::bad_alloc) { return nullptr; }
 		}
 
-		dom::XmlNodePtr firstChild() override
+		dom::NodePtr firstChild() override
 		{
-			if (!children.size()) return dom::XmlNodePtr();
+			if (!children.size()) return dom::NodePtr();
 			return children[0];
 		}
 
-		dom::XmlNodePtr lastChild() override
+		dom::NodePtr lastChild() override
 		{
-			if (!children.size()) return dom::XmlNodePtr();
+			if (!children.size()) return dom::NodePtr();
 			return children[children.size() - 1];
 		}
 
-		dom::XmlNodePtr previousSibling() override
+		dom::NodePtr previousSibling() override
 		{
-			dom::XmlNodePtr par = parent.lock();
+			dom::NodePtr par = parent.lock();
 			if (!index || !par)
-				return dom::XmlNodePtr();
+				return dom::NodePtr();
 
 			NodeImplInit* plist = (NodeImplInit*)par->internalData();
 			if (!plist) return nullptr;
 			return plist->children[index - 1];
 		}
 
-		dom::XmlNodePtr nextSibling() override
+		dom::NodePtr nextSibling() override
 		{
-			dom::XmlNodePtr par = parent.lock();
+			dom::NodePtr par = parent.lock();
 			if (!par)
-				return dom::XmlNodePtr();
+				return dom::NodePtr();
 
 			NodeImplInit* plist = (NodeImplInit*)par->internalData();
 			if (!plist) return nullptr;
 
 			size_t ndx = index + 1;
-			if (ndx >= plist->children.size()) return dom::XmlNodePtr();
+			if (ndx >= plist->children.size()) return dom::NodePtr();
 
 			return plist->children[ndx];
 		}
 
-		dom::XmlDocumentPtr ownerDocument() override { return document.lock(); }
+		dom::DocumentPtr ownerDocument() override { return document.lock(); }
 
-		size_t indexOf(const XmlNodePtr& node)
+		size_t indexOf(const NodePtr& node)
 		{
 			if (!node)
 				return children.size();
@@ -165,10 +165,10 @@ namespace dom { namespace impl {
 			return children.size(); // same as if node was nullptr
 		}
 
-		bool insertBefore(const XmlNodePtr& newChild, const XmlNodePtr& before = nullptr) override
+		bool insertBefore(const NodePtr& newChild, const NodePtr& before = nullptr) override
 		{
 			if (!newChild) return false;
-			dom::XmlDocumentPtr doc = newChild->ownerDocument();
+			dom::DocumentPtr doc = newChild->ownerDocument();
 			if (!doc || doc != document.lock()) return false;
 
 			size_t index = indexOf(before); // in case newChild == before
@@ -197,12 +197,12 @@ namespace dom { namespace impl {
 
 			return true;
 		}
-		bool insertBefore(const XmlNodeListPtr& children, const XmlNodePtr& before = nullptr) override
+		bool insertBefore(const NodeListPtr& children, const NodePtr& before = nullptr) override
 		{
 			if (!children)
 				return false;
 
-			std::vector<XmlNodePtr> copy;
+			std::vector<NodePtr> copy;
 			copy.reserve(children->length());
 
 			auto this_doc = document.lock();
@@ -211,7 +211,7 @@ namespace dom { namespace impl {
 			{
 				if (!node)
 					return false;
-				dom::XmlDocumentPtr doc = node->ownerDocument();
+				dom::DocumentPtr doc = node->ownerDocument();
 				if (!doc || doc != this_doc)
 					return false;
 
@@ -256,11 +256,11 @@ namespace dom { namespace impl {
 			return true;
 		}
 
-		bool appendChild(const dom::XmlNodePtr& newChild) override
+		bool appendChild(const dom::NodePtr& newChild) override
 		{
 			return insertBefore(newChild);
 		}
-		bool replaceChild(const XmlNodePtr& newChild, const XmlNodePtr& oldChild) override
+		bool replaceChild(const NodePtr& newChild, const NodePtr& oldChild) override
 		{
 			if (!oldChild)
 				return false;
@@ -270,7 +270,7 @@ namespace dom { namespace impl {
 
 			return removeChild(oldChild);
 		}
-		bool replaceChild(const XmlNodeListPtr& newChildren, const XmlNodePtr& oldChild) override
+		bool replaceChild(const NodeListPtr& newChildren, const NodePtr& oldChild) override
 		{
 			if (!oldChild)
 				return false;
@@ -281,7 +281,7 @@ namespace dom { namespace impl {
 			return removeChild(oldChild);
 		}
 
-		bool removeChild(const XmlNodePtr& child) override
+		bool removeChild(const NodePtr& child) override
 		{
 			if (!child)
 				return false;
@@ -313,14 +313,14 @@ namespace dom { namespace impl {
 
 		void* internalData() override { return (NodeImplInit*)this; }
 
-		bool appendAttr(const dom::XmlNodePtr& newChild) { return false; }
-		bool removeAttr(const dom::XmlNodePtr& child) { return false; }
+		bool appendAttr(const dom::NodePtr& newChild) { return false; }
+		bool removeAttr(const dom::NodePtr& child) { return false; }
 
-		XmlNodePtr find(const std::string& path, const Namespaces& ns) override
+		NodePtr find(const std::string& path, const Namespaces& ns) override
 		{
 			return xpath::XPath(path, ns).find(((T*)this)->shared_from_this());
 		}
-		XmlNodeListPtr findall(const std::string& path, const Namespaces& ns) override
+		NodeListPtr findall(const std::string& path, const Namespaces& ns) override
 		{
 			return xpath::XPath(path, ns).findall(((T*)this)->shared_from_this());
 		}

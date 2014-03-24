@@ -36,8 +36,6 @@ namespace dom
 	struct Attribute;
 	struct Text;
 	struct DocumentFragment;
-	struct ChildNode;
-	struct ParentNode;
 
 	using DocumentPtr         = std::shared_ptr<Document>;
 	using NodePtr             = std::shared_ptr<Node>;
@@ -48,15 +46,6 @@ namespace dom
 	using DocumentFragmentPtr = std::shared_ptr<DocumentFragment>;
 
 	// old names:
-	using XmlDocument            = Document;
-	using XmlNode                = Node;
-	using XmlChildNode           = ChildNode;
-	using XmlParentNode          = ParentNode;
-	using XmlNodeList            = NodeList;
-	using XmlElement             = Element;
-	using XmlAttribute           = Attribute;
-	using XmlText                = Text;
-	using XmlDocumentFragment    = DocumentFragment;
 	using XmlDocumentPtr         = DocumentPtr;
 	using XmlNodePtr             = NodePtr;
 	using XmlNodeListPtr         = NodeListPtr;

@@ -30,15 +30,15 @@
 
 namespace dom { namespace impl {
 
-	using NodePtrs = std::vector< dom::XmlNodePtr >;
+	using NodePtrs = std::vector< dom::NodePtr >;
 
-	class NodeList : public dom::XmlNodeList
+	class NodeList : public dom::NodeList
 	{
 		NodePtrs children;
 	public:
 		NodeList(const NodePtrs& init);
 
-		dom::XmlNodePtr item(size_t index) override;
+		dom::NodePtr item(size_t index) override;
 		size_t length() const override;
 		bool remove() override;
 	};

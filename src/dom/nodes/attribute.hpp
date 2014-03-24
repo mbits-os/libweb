@@ -29,17 +29,17 @@
 
 namespace dom { namespace impl {
 
-	class Attribute : public NodeImpl<Attribute, dom::XmlAttribute>
+	class Attribute : public NodeImpl<Attribute, dom::Attribute>
 	{
 	public:
 		Attribute(const Init& init) : NodeImpl(init) {}
 
-		dom::XmlNodePtr previousSibling() override
+		dom::NodePtr previousSibling() override
 		{
 			return false;
 		}
 
-		dom::XmlNodePtr nextSibling() override
+		dom::NodePtr nextSibling() override
 		{
 			return false;
 		}

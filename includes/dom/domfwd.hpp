@@ -29,21 +29,41 @@
 
 namespace dom
 {
-	struct XmlDocument;
-	struct XmlNode;
-	struct XmlNodeList;
-	struct XmlElement;
-	struct XmlAttribute;
-	struct XmlText;
-	struct XmlDocumentFragment;
+	struct Document;
+	struct Node;
+	struct NodeList;
+	struct Element;
+	struct Attribute;
+	struct Text;
+	struct DocumentFragment;
+	struct ChildNode;
+	struct ParentNode;
 
-	using XmlDocumentPtr         = std::shared_ptr<XmlDocument>;
-	using XmlNodePtr             = std::shared_ptr<XmlNode>;
-	using XmlNodeListPtr         = std::shared_ptr<XmlNodeList>;
-	using XmlElementPtr          = std::shared_ptr<XmlElement>;
-	using XmlAttributePtr        = std::shared_ptr<XmlAttribute>;
-	using XmlTextPtr             = std::shared_ptr<XmlText>;
-	using XmlDocumentFragmentPtr = std::shared_ptr<XmlDocumentFragment>;
+	using DocumentPtr         = std::shared_ptr<Document>;
+	using NodePtr             = std::shared_ptr<Node>;
+	using NodeListPtr         = std::shared_ptr<NodeList>;
+	using ElementPtr          = std::shared_ptr<Element>;
+	using AttributePtr        = std::shared_ptr<Attribute>;
+	using TextPtr             = std::shared_ptr<Text>;
+	using DocumentFragmentPtr = std::shared_ptr<DocumentFragment>;
+
+	// old names:
+	using XmlDocument            = Document;
+	using XmlNode                = Node;
+	using XmlChildNode           = ChildNode;
+	using XmlParentNode          = ParentNode;
+	using XmlNodeList            = NodeList;
+	using XmlElement             = Element;
+	using XmlAttribute           = Attribute;
+	using XmlText                = Text;
+	using XmlDocumentFragment    = DocumentFragment;
+	using XmlDocumentPtr         = DocumentPtr;
+	using XmlNodePtr             = NodePtr;
+	using XmlNodeListPtr         = NodeListPtr;
+	using XmlElementPtr          = ElementPtr;
+	using XmlAttributePtr        = AttributePtr;
+	using XmlTextPtr             = TextPtr;
+	using XmlDocumentFragmentPtr = DocumentFragmentPtr;
 }
 
 #endif // __DOM_DOMFWD_HPP__

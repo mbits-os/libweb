@@ -36,39 +36,39 @@ namespace dom
 		struct NodeSelector;
 
 		template <>
-		struct NodeSelector<XmlNode>
+		struct NodeSelector<Node>
 		{
-			using node_t = XmlNode;
+			using node_t = Node;
 			using node_ptr = std::shared_ptr<node_t>;
 
-			static node_ptr item(const XmlNodeListPtr& list, size_t index) { return list->item(index); }
+			static node_ptr item(const NodeListPtr& list, size_t index) { return list->item(index); }
 		};
 
 		template <>
-		struct NodeSelector<XmlElement>
+		struct NodeSelector<Element>
 		{
-			using node_t = XmlElement;
+			using node_t = Element;
 			using node_ptr = std::shared_ptr<node_t>;
 
-			static node_ptr item(const XmlNodeListPtr& list, size_t index) { return list->element(index); }
+			static node_ptr item(const NodeListPtr& list, size_t index) { return list->element(index); }
 		};
 
 		template <>
-		struct NodeSelector<XmlText>
+		struct NodeSelector<Text>
 		{
-			using node_t = XmlText;
+			using node_t = Text;
 			using node_ptr = std::shared_ptr<node_t>;
 
-			static node_ptr item(const XmlNodeListPtr& list, size_t index) { return list->text(index); }
+			static node_ptr item(const NodeListPtr& list, size_t index) { return list->text(index); }
 		};
 
 		template <>
-		struct NodeSelector<XmlAttribute>
+		struct NodeSelector<Attribute>
 		{
-			using node_t = XmlAttribute;
+			using node_t = Attribute;
 			using node_ptr = std::shared_ptr<node_t>;
 
-			static node_ptr item(const XmlNodeListPtr& list, size_t index) { return list->attr(index); }
+			static node_ptr item(const NodeListPtr& list, size_t index) { return list->attr(index); }
 		};
 
 		template <typename NodeType>
@@ -85,7 +85,7 @@ namespace dom
 				typedef node_ptr pointer;
 				typedef node_ptr reference;
 
-				list_iterator(const XmlNodeListPtr& list, size_t offset) : m_list(list), m_offset(offset) {}
+				list_iterator(const NodeListPtr& list, size_t offset) : m_list(list), m_offset(offset) {}
 
 				list_iterator() = default;
 				list_iterator(const list_iterator&) = default;
@@ -139,15 +139,15 @@ namespace dom
 					return (!(*this == _Right));
 				}
 			private:
-				XmlNodeListPtr m_list;
+				NodeListPtr m_list;
 				size_t m_offset = 0;
 			};
 
 			using iterator = list_iterator;
 			using const_iterator = list_iterator;
 
-			XmlNodeListPtr list;
-			NodeListRangeAdapter(const XmlNodeListPtr& list) : list(list) {}
+			NodeListPtr list;
+			NodeListRangeAdapter(const NodeListPtr& list) : list(list) {}
 			iterator begin() const { return iterator(list, 0); }
 			iterator end() const
 			{
@@ -158,24 +158,24 @@ namespace dom
 		};
 	}
 
-	inline range::NodeListRangeAdapter<XmlNode> list_nodes(const XmlNodeListPtr& list)
+	inline range::NodeListRangeAdapter<Node> list_nodes(const NodeListPtr& list)
 	{
-		return range::NodeListRangeAdapter<XmlNode>(list);
+		return range::NodeListRangeAdapter<Node>(list);
 	}
 
-	inline range::NodeListRangeAdapter<XmlElement> list_elements(const XmlNodeListPtr& list)
+	inline range::NodeListRangeAdapter<Element> list_elements(const NodeListPtr& list)
 	{
-		return range::NodeListRangeAdapter<XmlElement>(list);
+		return range::NodeListRangeAdapter<Element>(list);
 	}
 
-	inline range::NodeListRangeAdapter<XmlText> list_texts(const XmlNodeListPtr& list)
+	inline range::NodeListRangeAdapter<Text> list_texts(const NodeListPtr& list)
 	{
-		return range::NodeListRangeAdapter<XmlText>(list);
+		return range::NodeListRangeAdapter<Text>(list);
 	}
 
-	inline range::NodeListRangeAdapter<XmlAttribute> list_atts(const XmlNodeListPtr& list)
+	inline range::NodeListRangeAdapter<Attribute> list_atts(const NodeListPtr& list)
 	{
-		return range::NodeListRangeAdapter<XmlAttribute>(list);
+		return range::NodeListRangeAdapter<Attribute>(list);
 	}
 }
 

@@ -29,19 +29,19 @@
 
 namespace dom
 {
-	struct XmlElement : XmlParentNode
+	struct Element : ParentNode
 	{
 		virtual std::string tagName() const { return nodeName(); }
 		virtual std::string stringValue() override { return innerText(); }
 		virtual std::string getAttribute(const std::string& name) = 0;
-		virtual XmlAttributePtr getAttributeNode(const std::string& name) = 0;
-		virtual bool setAttribute(const XmlAttributePtr& attr) = 0;
-		virtual bool removeAttribute(const XmlAttributePtr& attr) = 0;
+		virtual AttributePtr getAttributeNode(const std::string& name) = 0;
+		virtual bool setAttribute(const AttributePtr& attr) = 0;
+		virtual bool removeAttribute(const AttributePtr& attr) = 0;
 		virtual bool setAttribute(const std::string& attr, const std::string& value) = 0;
 		virtual bool removeAttribute(const std::string& attr) = 0;
-		virtual XmlNodeListPtr getAttributes() = 0;
+		virtual NodeListPtr getAttributes() = 0;
 		virtual bool hasAttribute(const std::string& name) = 0;
-		virtual XmlNodeListPtr getElementsByTagName(const std::string& tagName) = 0;
+		virtual NodeListPtr getElementsByTagName(const std::string& tagName) = 0;
 		virtual std::string innerText() = 0;
 	};
 }

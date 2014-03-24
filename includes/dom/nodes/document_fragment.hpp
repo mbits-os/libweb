@@ -29,9 +29,9 @@
 
 namespace dom
 {
-	struct XmlDocumentFragment : XmlParentNode
+	struct DocumentFragment : ParentNode
 	{
-		virtual XmlNodeListPtr getElementsByTagName(const std::string& tagName) = 0;
+		virtual NodeListPtr getElementsByTagName(const std::string& tagName) = 0;
 	};
 }
 

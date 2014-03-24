@@ -29,29 +29,29 @@
 
 namespace dom
 {
-	struct XmlNodeList
+	struct NodeList
 	{
-		virtual ~XmlNodeList() {}
-		virtual XmlNodePtr item(size_t index) = 0;
-		XmlElementPtr element(size_t index)
+		virtual ~NodeList() {}
+		virtual NodePtr item(size_t index) = 0;
+		ElementPtr element(size_t index)
 		{
 			XmlNodePtr i = item(index);
 			if (i && i->nodeType() == ELEMENT_NODE)
-				return std::static_pointer_cast<XmlElement>(i);
-			return XmlElementPtr();
+				return std::static_pointer_cast<Element>(i);
+			return ElementPtr();
 		}
-		XmlTextPtr text(size_t index)
+		TextPtr text(size_t index)
 		{
 			XmlNodePtr i = item(index);
 			if (i && i->nodeType() == TEXT_NODE)
-				return std::static_pointer_cast<XmlText>(i);
-			return XmlTextPtr();
+				return std::static_pointer_cast<Text>(i);
+			return TextPtr();
 		}
-		XmlAttributePtr attr(size_t index)
+		AttributePtr attr(size_t index)
 		{
 			XmlNodePtr i = item(index);
 			if (i && i->nodeType() == ATTRIBUTE_NODE)
-				return std::static_pointer_cast<XmlAttribute>(i);
+				return std::static_pointer_cast<Attribute>(i);
 			return nullptr;
 		}
 		virtual size_t length() const = 0;

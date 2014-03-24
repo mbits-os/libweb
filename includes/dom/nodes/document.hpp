@@ -29,23 +29,23 @@
 
 namespace dom
 {
-	struct XmlDocument : XmlNode
+	struct Document : Node
 	{
-		static XmlDocumentPtr create();
-		static XmlDocumentPtr fromFile(const char* path);
+		static DocumentPtr create();
+		static DocumentPtr fromFile(const char* path);
 
-		virtual XmlElementPtr documentElement() = 0;
-		virtual void setDocumentElement(const XmlElementPtr& elem) = 0;
-		virtual XmlDocumentFragmentPtr associatedFragment() = 0;
-		virtual void setFragment(const XmlDocumentFragmentPtr& fragment) = 0;
+		virtual ElementPtr documentElement() = 0;
+		virtual void setDocumentElement(const ElementPtr& elem) = 0;
+		virtual DocumentFragmentPtr associatedFragment() = 0;
+		virtual void setFragment(const DocumentFragmentPtr& fragment) = 0;
 
-		virtual XmlElementPtr createElement(const std::string& tagName) = 0;
-		virtual XmlTextPtr createTextNode(const std::string& data) = 0;
-		virtual XmlAttributePtr createAttribute(const std::string& name, const std::string& value) = 0;
-		virtual XmlDocumentFragmentPtr createDocumentFragment() = 0;
+		virtual ElementPtr createElement(const std::string& tagName) = 0;
+		virtual TextPtr createTextNode(const std::string& data) = 0;
+		virtual AttributePtr createAttribute(const std::string& name, const std::string& value) = 0;
+		virtual DocumentFragmentPtr createDocumentFragment() = 0;
 
-		virtual XmlNodeListPtr getElementsByTagName(const std::string& tagName) = 0;
-		virtual XmlElementPtr getElementById(const std::string& elementId) = 0;
+		virtual NodeListPtr getElementsByTagName(const std::string& tagName) = 0;
+		virtual ElementPtr getElementById(const std::string& elementId) = 0;
 	};
 }
 

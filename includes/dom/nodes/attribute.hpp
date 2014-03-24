@@ -29,14 +29,14 @@
 
 namespace dom
 {
-	struct XmlAttribute: XmlNode
+	struct Attribute: Node
 	{
 		virtual std::string name() const { return nodeName(); }
 		virtual std::string value() const { return nodeValue(); }
 		virtual void value(const std::string& val) { nodeValue(val); }
-		virtual XmlElementPtr ownerElement()
+		virtual ElementPtr ownerElement()
 		{
-			return std::static_pointer_cast<XmlElement>(parentNode());
+			return std::static_pointer_cast<Element>(parentNode());
 		}
 	};
 }

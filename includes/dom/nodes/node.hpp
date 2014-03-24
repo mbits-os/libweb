@@ -70,9 +70,9 @@ namespace dom
 		DOCUMENT_FRAGMENT_NODE = 4
 	};
 
-	struct XmlNode
+	struct Node
 	{
-		virtual ~XmlNode() {}
+		virtual ~Node() {}
 		virtual std::string nodeName() const = 0;
 		virtual const QName& nodeQName() const = 0;
 		virtual std::string nodeValue() const = 0;
@@ -80,49 +80,49 @@ namespace dom
 		virtual void nodeValue(const std::string& val) = 0;
 		virtual NODE_TYPE nodeType() const = 0;
 
-		virtual XmlNodePtr parentNode() = 0;
-		virtual XmlNodeListPtr childNodes() = 0;
-		virtual XmlNodePtr firstChild() = 0;
-		virtual XmlNodePtr lastChild() = 0;
-		virtual XmlNodePtr previousSibling() = 0;
-		virtual XmlNodePtr nextSibling() = 0;
+		virtual NodePtr parentNode() = 0;
+		virtual NodeListPtr childNodes() = 0;
+		virtual NodePtr firstChild() = 0;
+		virtual NodePtr lastChild() = 0;
+		virtual NodePtr previousSibling() = 0;
+		virtual NodePtr nextSibling() = 0;
 
-		virtual XmlDocumentPtr ownerDocument() = 0;
-		virtual bool insertBefore(const XmlNodePtr& child, const XmlNodePtr& before = nullptr) = 0;
-		virtual bool insertBefore(const XmlNodeListPtr& children, const XmlNodePtr& before = nullptr) = 0;
-		virtual bool appendChild(const XmlNodePtr& newChild) = 0;
-		virtual bool replaceChild(const XmlNodePtr& newChild, const XmlNodePtr& oldChild) = 0;
-		virtual bool replaceChild(const XmlNodeListPtr& newChildren, const XmlNodePtr& oldChild) = 0;
-		virtual bool removeChild(const XmlNodePtr& child) = 0;
+		virtual DocumentPtr ownerDocument() = 0;
+		virtual bool insertBefore(const NodePtr& child, const NodePtr& before = nullptr) = 0;
+		virtual bool insertBefore(const NodeListPtr& children, const NodePtr& before = nullptr) = 0;
+		virtual bool appendChild(const NodePtr& newChild) = 0;
+		virtual bool replaceChild(const NodePtr& newChild, const NodePtr& oldChild) = 0;
+		virtual bool replaceChild(const NodeListPtr& newChildren, const NodePtr& oldChild) = 0;
+		virtual bool removeChild(const NodePtr& child) = 0;
 
 		virtual void* internalData() = 0;
 
-		virtual XmlNodePtr find(const std::string& path, const Namespaces& ns) = 0;
-		virtual XmlNodePtr find(const std::string& path) { return find(path, nullptr); }
-		virtual XmlNodeListPtr findall(const std::string& path, const Namespaces& ns) = 0;
+		virtual NodePtr find(const std::string& path, const Namespaces& ns) = 0;
+		virtual NodePtr find(const std::string& path) { return find(path, nullptr); }
+		virtual NodeListPtr findall(const std::string& path, const Namespaces& ns) = 0;
 	};
 
-	struct XmlChildNode : XmlNode
+	struct ChildNode : Node
 	{
-		virtual bool before(const XmlNodePtr& node) = 0;
+		virtual bool before(const NodePtr& node) = 0;
 		virtual bool before(const std::string& data) = 0;
-		virtual bool before(const XmlNodeListPtr& nodes) = 0;
-		virtual bool after(const XmlNodePtr& node) = 0;
+		virtual bool before(const NodeListPtr& nodes) = 0;
+		virtual bool after(const NodePtr& node) = 0;
 		virtual bool after(const std::string& data) = 0;
-		virtual bool after(const XmlNodeListPtr& nodes) = 0;
-		virtual bool replace(const XmlNodePtr& node) = 0;
+		virtual bool after(const NodeListPtr& nodes) = 0;
+		virtual bool replace(const NodePtr& node) = 0;
 		virtual bool replace(const std::string& data) = 0;
-		virtual bool replace(const XmlNodeListPtr& nodes) = 0;
+		virtual bool replace(const NodeListPtr& nodes) = 0;
 		virtual bool remove() = 0;
 	};
 
-	struct XmlParentNode : XmlChildNode
+	struct ParentNode : ChildNode
 	{
-		virtual bool prepend(const XmlNodePtr& node) = 0;
-		virtual bool prepend(const XmlNodeListPtr& nodes) = 0;
+		virtual bool prepend(const NodePtr& node) = 0;
+		virtual bool prepend(const NodeListPtr& nodes) = 0;
 		virtual bool prepend(const std::string& data) = 0;
-		virtual bool append(const XmlNodePtr& node) = 0;
-		virtual bool append(const XmlNodeListPtr& nodes) = 0;
+		virtual bool append(const NodePtr& node) = 0;
+		virtual bool append(const NodeListPtr& nodes) = 0;
 		virtual bool append(const std::string& data) = 0;
 	};
 }

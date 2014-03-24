@@ -29,7 +29,7 @@
 
 namespace dom
 {
-	struct XmlText: XmlChildNode
+	struct Text: ChildNode
 	{
 		virtual std::string data() const { return nodeValue(); }
 	};

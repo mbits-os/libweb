@@ -44,15 +44,6 @@ namespace dom
 	using AttributePtr        = std::shared_ptr<Attribute>;
 	using TextPtr             = std::shared_ptr<Text>;
 	using DocumentFragmentPtr = std::shared_ptr<DocumentFragment>;
-
-	// old names:
-	using XmlDocumentPtr         = DocumentPtr;
-	using XmlNodePtr             = NodePtr;
-	using XmlNodeListPtr         = NodeListPtr;
-	using XmlElementPtr          = ElementPtr;
-	using XmlAttributePtr        = AttributePtr;
-	using XmlTextPtr             = TextPtr;
-	using XmlDocumentFragmentPtr = DocumentFragmentPtr;
 }
 
 #endif // __DOM_DOMFWD_HPP__

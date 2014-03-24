@@ -39,7 +39,7 @@ namespace dom { namespace impl {
 		}
 	}
 
-	dom::XmlNodeListPtr DocumentFragment::getElementsByTagName(const std::string& tagName)
+	dom::NodeListPtr DocumentFragment::getElementsByTagName(const std::string& tagName)
 	{
 		NodePtrs out;
 		enumTagNames(tagName, out);

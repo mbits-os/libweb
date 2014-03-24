@@ -37,8 +37,8 @@
 
 namespace dom
 {
-	void Print(const XmlNodePtr& node, bool ignorews = false, size_t depth = 0);
-	void Print(const XmlNodeListPtr& subs, bool ignorews = false, size_t depth = 0);
+	void Print(const NodePtr& node, bool ignorews = false, size_t depth = 0);
+	void Print(const NodeListPtr& subs, bool ignorews = false, size_t depth = 0);
 }
 
 #endif // __DOM_HPP__

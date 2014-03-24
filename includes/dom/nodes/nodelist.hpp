@@ -35,21 +35,21 @@ namespace dom
 		virtual NodePtr item(size_t index) = 0;
 		ElementPtr element(size_t index)
 		{
-			XmlNodePtr i = item(index);
+			NodePtr i = item(index);
 			if (i && i->nodeType() == ELEMENT_NODE)
 				return std::static_pointer_cast<Element>(i);
 			return ElementPtr();
 		}
 		TextPtr text(size_t index)
 		{
-			XmlNodePtr i = item(index);
+			NodePtr i = item(index);
 			if (i && i->nodeType() == TEXT_NODE)
 				return std::static_pointer_cast<Text>(i);
 			return TextPtr();
 		}
 		AttributePtr attr(size_t index)
 		{
-			XmlNodePtr i = item(index);
+			NodePtr i = item(index);
 			if (i && i->nodeType() == ATTRIBUTE_NODE)
 				return std::static_pointer_cast<Attribute>(i);
 			return nullptr;

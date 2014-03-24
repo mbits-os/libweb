@@ -65,20 +65,20 @@ namespace dom
 			TEST m_test;
 			QName m_name;
 			SimpleSelector(): m_axis(AXIS_CHILD), m_test(TEST_NODE) {}
-			bool passable(XmlNodePtr& node);
-			void select(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
+			bool passable(NodePtr& node);
+			void select(const NodePtr& context, std::list<NodePtr>& list);
 		private:
-			void test(const XmlNodePtr& node, std::list<XmlNodePtr>& list);
-			void select(const XmlNodeListPtr& nodes, std::list<XmlNodePtr>& list);
+			void test(const NodePtr& node, std::list<NodePtr>& list);
+			void select(const NodeListPtr& nodes, std::list<NodePtr>& list);
 
-			void child(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
-			void descendant(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
-			void attribute(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
-			void self(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
-			void descendant_or_self(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
-			void parent(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
-			void ancestor(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
-			void ancestor_or_self(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
+			void child(const NodePtr& context, std::list<NodePtr>& list);
+			void descendant(const NodePtr& context, std::list<NodePtr>& list);
+			void attribute(const NodePtr& context, std::list<NodePtr>& list);
+			void self(const NodePtr& context, std::list<NodePtr>& list);
+			void descendant_or_self(const NodePtr& context, std::list<NodePtr>& list);
+			void parent(const NodePtr& context, std::list<NodePtr>& list);
+			void ancestor(const NodePtr& context, std::list<NodePtr>& list);
+			void ancestor_or_self(const NodePtr& context, std::list<NodePtr>& list);
 		};
 		typedef std::list<SimpleSelector> SimpleSelectors;
 
@@ -88,7 +88,7 @@ namespace dom
 			SimpleSelectors m_selectors;
 			std::string m_value;
 			Predicate(): m_type(PRED_EXISTS) {}
-			bool test(const XmlNodePtr& context);
+			bool test(const NodePtr& context);
 		};
 		typedef std::list<Predicate> Predicates;
 
@@ -96,15 +96,15 @@ namespace dom
 		{
 			SimpleSelector m_selector;
 			Predicates m_preds;
-			void select(const XmlNodePtr& context, std::list<XmlNodePtr>& list);
+			void select(const NodePtr& context, std::list<NodePtr>& list);
 		};
 		typedef std::list<Segment> Segments;
 
 		struct XPath
 		{
 			XPath(const std::string& xpath, const Namespaces& ns);
-			XmlNodePtr find(const XmlNodePtr& context);
-			XmlNodeListPtr findall(const XmlNodePtr& context);
+			NodePtr find(const NodePtr& context);
+			NodeListPtr findall(const NodePtr& context);
 			Segments m_segments;
 		private:
 			const char* readSegment(const char* ptr, const char* end, Segment& seg, const Namespaces& ns);

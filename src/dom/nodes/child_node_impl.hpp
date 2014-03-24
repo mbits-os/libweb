@@ -39,7 +39,7 @@ namespace dom { namespace impl {
 		{
 		}
 
-		bool before(const XmlNodePtr& node) override
+		bool before(const NodePtr& node) override
 		{
 			auto parent = static_cast<T*>(this)->parentNode();
 			if (!parent)
@@ -52,14 +52,14 @@ namespace dom { namespace impl {
 			if (!node) return false;
 			return before(node);
 		}
-		bool before(const XmlNodeListPtr& nodes) override
+		bool before(const NodeListPtr& nodes) override
 		{
 			auto parent = static_cast<T*>(this)->parentNode();
 			if (!parent)
 				return false;
 			return parent->insertBefore(nodes, Super::shared_from_this());
 		}
-		bool after(const XmlNodePtr& node) override
+		bool after(const NodePtr& node) override
 		{
 			auto parent = static_cast<T*>(this)->parentNode();
 			if (!parent)
@@ -72,14 +72,14 @@ namespace dom { namespace impl {
 			if (!node) return false;
 			return after(node);
 		}
-		bool after(const XmlNodeListPtr& nodes) override
+		bool after(const NodeListPtr& nodes) override
 		{
 			auto parent = static_cast<T*>(this)->parentNode();
 			if (!parent)
 				return false;
 			return parent->insertBefore(nodes, parent->nextSibling());
 		}
-		bool replace(const XmlNodePtr& node) override
+		bool replace(const NodePtr& node) override
 		{
 			auto parent = static_cast<T*>(this)->parentNode();
 			if (!parent)
@@ -92,7 +92,7 @@ namespace dom { namespace impl {
 			if (!node) return false;
 			return replace(node);
 		}
-		bool replace(const XmlNodeListPtr& nodes) override
+		bool replace(const NodeListPtr& nodes) override
 		{
 			auto parent = static_cast<T*>(this)->parentNode();
 			if (!parent)

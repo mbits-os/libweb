@@ -38,13 +38,13 @@ namespace dom { namespace impl {
 		{
 		}
 
-		bool prepend(const XmlNodePtr& node) override
+		bool prepend(const NodePtr& node) override
 		{
 			auto _final = static_cast<T*>(this);
 			return _final->insertBefore(node, _final->firstChild());
 		}
 
-		bool prepend(const XmlNodeListPtr& nodes) override
+		bool prepend(const NodeListPtr& nodes) override
 		{
 			auto _final = static_cast<T*>(this);
 			return _final->insertBefore(nodes, _final->firstChild());
@@ -57,12 +57,12 @@ namespace dom { namespace impl {
 			return prepend(node);
 		}
 
-		bool append(const XmlNodePtr& node) override
+		bool append(const NodePtr& node) override
 		{
 			return static_cast<T*>(this)->insertBefore(node);
 		}
 
-		bool append(const XmlNodeListPtr& nodes) override
+		bool append(const NodeListPtr& nodes) override
 		{
 			return static_cast<T*>(this)->insertBefore(nodes);
 		}

@@ -28,13 +28,13 @@
 
 namespace dom { namespace impl {
 
-	using ListOfNodes = std::vector< dom::XmlNodePtr >;
+	using ListOfNodes = std::vector< dom::NodePtr >;
 
 	NodeList::NodeList(const ListOfNodes& init) : children(init) {}
 
-	dom::XmlNodePtr NodeList::item(size_t index)
+	dom::NodePtr NodeList::item(size_t index)
 	{
-		if (index >= children.size()) return dom::XmlNodePtr();
+		if (index >= children.size()) return dom::NodePtr();
 		return children[index];
 	}
 
@@ -55,7 +55,7 @@ namespace dom { namespace impl {
 }}
 
 namespace dom {
-	XmlNodeListPtr createList(const impl::NodePtrs& list)
+	NodeListPtr createList(const impl::NodePtrs& list)
 	{
 		try {
 			return std::make_shared<impl::NodeList>(list);

@@ -28,7 +28,12 @@
 #include <vector>
 #include <utils.hpp>
 #include <dom/dom.hpp>
-#include <htmlcxx/html/ParserDom.h>
+#include <cstring>
+
+namespace google
+{
+	#include <gumbo.h>
+}
 
 namespace utf8
 {
@@ -72,7 +77,7 @@ namespace utf8
 		utf8.append(seq, bytes);
 	}
 
-	std::string fromUtf32(const uint32_t* string, size_t length)
+	inline std::string fromUtf32(const uint32_t* string, size_t length)
 	{
 		size_t len = 0;
 		auto c = string;
@@ -94,13 +99,13 @@ namespace utf8
 		return utf8;
 	}
 
-	std::string fromUtf32(uint32_t c)
+	inline std::string fromUtf32(uint32_t c)
 	{
 		return fromUtf32(&c, 1);
 	}
 
 	template <template <typename T, typename A> class C, typename A>
-	std::string fromUtf32(const C<uint32_t, A>& c)
+	inline std::string fromUtf32(const C<uint32_t, A>& c)
 	{
 		return fromUtf32(c.data(), c.size());
 	}
@@ -152,20 +157,26 @@ namespace dom { namespace parsers { namespace html {
 		}
 	};
 
-	class Parser : public parsers::Parser, htmlcxx::HTML::ParserSax
+	class Parser : public parsers::Parser
 	{
 		dom::ElementPtr elem;
 		dom::DocumentFragmentPtr container;
 		std::string text;
+		std::string encoding;
 		TextConverterPtr converter;
 		std::string conv(const std::string& s) { return converter->conv(s); }
 		bool switchConv(std::string cp)
 		{
 			std::tolower(cp);
+			if (converter && cp == encoding)
+				return true;
+
 			if (cp.empty() || cp == "utf-8" || cp == "utf8")
 				converter = std::make_shared<Identity>();
 			else
 				converter = eXpatConverter::create(cp);
+
+			encoding = cp;
 
 			return !!converter;
 		}
@@ -279,129 +290,166 @@ namespace dom { namespace parsers { namespace html {
 			return switchConv(cp);
 		}
 
-		void foundTag(htmlcxx::HTML::Node node, bool isEnd) override
+		template <typename T>
+		struct gumbo_vector
 		{
-			std::string nodeName = std::tolower(node.tagName());
+			typedef T* iterator;
+			iterator data;
+			size_t length;
+			gumbo_vector(google::GumboVector& v) : data((iterator)v.data), length(v.length) {}
+			iterator begin() const { return data; }
+			iterator end() const { return data + length; }
+		};
 
-			if (!isEnd)
+		static std::string gumbo_string(const google::GumboStringPiece& text)
+		{
+			return std::string(text.data, text.length);
+		}
+
+		static bool textFromGumbo(const std::shared_ptr<dom::ParentNode>& parent, google::GumboText* text)
+		{
+			return parent->append(text->text);
+		}
+
+		static bool elementFromGumbo(const std::shared_ptr<dom::ParentNode>& parent, google::GumboElement* element)
+		{
+			if (!element->original_tag.length) // algorithmical
 			{
-				addText();
-
-				dom::ElementPtr current = doc->createElement(nodeName);
-				if (!current) return;
-
-				node.parseAttributes();
-				for (auto&& attr : node.attributes())
+				for (auto&& node : gumbo_vector<google::GumboNode*>{ element->children })
 				{
-					// fixing issues with htmlcxx
-					if (attr.first.empty() || std::isdigit((unsigned char)attr.first[0]))
-						continue;
-
-					auto node = doc->createAttribute(std::tolower(attr.first), attr.second);
-					if (!node) continue;
-					current->setAttribute(node);
+					if (!fromGumbo(parent, node))
+						return false;
 				}
+				return true;
+			}
 
-				if (elem)
-					elem->appendChild(current);
-				else
-					container->appendChild(current);
+			std::string tagName = element->tag_namespace == google::GUMBO_NAMESPACE_HTML ?
+				google::gumbo_normalized_tagname(element->tag) : gumbo_string(element->original_tag);
 
-				if (nodeName == "meta")
+			auto doc = parent->ownerDocument();
+			if (!doc)
+				return false;
+			auto e = doc->createElement(tagName);
+			if (!e)
+				return false;
+			parent->append(e);
+
+			for (auto&& attr : gumbo_vector<google::GumboAttribute*>{ element->attributes })
+			{
+				e->setAttribute(attr->name, attr->value);
+			}
+
+			for (auto&& node : gumbo_vector<google::GumboNode*>{ element->children })
+			{
+				if (!fromGumbo(e, node))
+					return false;
+			}
+
+			return true;
+		}
+
+		static bool fromGumbo(const std::shared_ptr<dom::ParentNode>& parent, google::GumboNode* node)
+		{
+			if (!node)
+				return false;
+
+			switch (node->type)
+			{
+			case google::GUMBO_NODE_ELEMENT:
+				return elementFromGumbo(parent, &node->v.element);
+			case google::GUMBO_NODE_TEXT:
+			case google::GUMBO_NODE_CDATA:
+			case google::GUMBO_NODE_WHITESPACE:
+				return textFromGumbo(parent, &node->v.text);
+			}
+
+			return true;
+		}
+
+		static bool breakContentType(std::string content, std::string& charset)
+		{
+			std::string::size_type semi = content.find(';');
+			std::string::size_type len = content.length();
+			while (semi != std::string::npos)
+			{
+				++semi;
+				while (semi < len && isspace((unsigned char)content[semi])) ++semi;
+				if (std::tolower(content.substr(semi, 7)) == "charset")
 				{
-					std::string
-						equiv = std::tolower(current->getAttribute("http-equiv")),
-						content = current->getAttribute("content");
-					if (equiv == "content-type")
+					semi += 7;
+					while (semi < len && isspace((unsigned char)content[semi])) ++semi;
+					if (semi < len && content[semi] == '=')
 					{
-						std::string charset;
-						std::string::size_type semi = content.find(';');
-						std::string::size_type len = content.length();
-						while (semi != std::string::npos)
-						{
-							++semi;
-							while (semi < len && isspace((unsigned char)content[semi])) ++semi;
-							if (std::tolower(content.substr(semi, 7)) == "charset")
-							{
-								semi += 7;
-								while (semi < len && isspace((unsigned char)content[semi])) ++semi;
-								if (semi < len && content[semi] == '=')
-								{
-									++semi;
-									std::string::size_type last = content.find(';', semi);
-									if (last == std::string::npos)
-										charset = content.substr(semi);
-									else
-										charset = content.substr(semi, last - semi);
-									std::trim(charset);
-									std::tolower(charset);
-								}
-								break;
-							}
-							semi = content.find(';', semi);
-						}
+						++semi;
+						std::string::size_type last = content.find(';', semi);
+						if (last == std::string::npos)
+							charset = content.substr(semi);
+						else
+							charset = content.substr(semi, last - semi);
+						std::trim(charset);
+						std::tolower(charset);
 
-						if (switchConv(charset))
-						{
-							// printf("\rUnexpected character set: %s\n", charset.c_str());
-						}
+						return true;
 					}
-					return;
 				}
-
-				if (nodeName != "area" &&
-					nodeName != "base" &&
-					nodeName != "basefont" &&
-					nodeName != "br" &&
-					nodeName != "col" &&
-					nodeName != "frame" &&
-					nodeName != "hr" &&
-					nodeName != "img" &&
-					nodeName != "input" &&
-					nodeName != "isindex" &&
-					nodeName != "link" &&
-					//nodeName != "meta" && //always true
-					nodeName != "param" &&
-					nodeName != "nextid" &&
-					nodeName != "bgsound" &&
-					nodeName != "embed" &&
-					nodeName != "keygen" &&
-					nodeName != "spacer" &&
-					nodeName != "wbr")
-				{
-					elem = current;
-				}
-
-				return;
+				semi = content.find(';', semi);
 			}
 
-			dom::NodePtr xmlnode = elem;
-			while (xmlnode)
+			return false;
+		}
+
+		static bool findEncoding(google::GumboElement* e, std::string& out)
+		{
+			if (e->tag == google::GUMBO_TAG_META)
 			{
-				if (xmlnode->nodeName() == nodeName)
-					break;
-
-				xmlnode = xmlnode->parentNode();
+				auto attr = google::gumbo_get_attribute(&e->attributes, "http-equiv");
+				if (attr && std::tolower(attr->value) == "content-type")
+				{
+					attr = google::gumbo_get_attribute(&e->attributes, "content");
+					if (attr)
+						return breakContentType(attr->value, out);
+				}
 			}
 
-			if (!xmlnode) return;
-			elem = std::static_pointer_cast<dom::Element>(xmlnode);
+			for (auto&& node : gumbo_vector<google::GumboNode*>{ e->children })
+			{
+				if (node->type != google::GUMBO_NODE_ELEMENT)
+					continue;
 
-			addText();
+				if (findEncoding(&node->v.element, out))
+					return true;
+			}
 
-			if (!elem) return;
-
-			elem = std::static_pointer_cast<dom::Element>(elem->parentNode());
+			return false;
 		}
 
-		void foundText(htmlcxx::HTML::Node node) override
+		bool supportsChunks() const override { return false; }
+		bool onData(const void* begin, size_t size) override
 		{
-			text += node.text().c_str();
-		}
+			auto output = google::gumbo_parse_with_options(&google::kGumboDefaultOptions, (const char*)begin, size);
+			if (!output)
+				return false;
 
-		void endParsing() override
-		{
-			addText();
+			std::string encoding, newText;
+			auto found = findEncoding(&output->root->v.element, encoding);
+			if (found && encoding != this->encoding)
+			{
+				// restart
+				google::gumbo_destroy_output(&google::kGumboDefaultOptions, output);
+
+				switchConv(encoding);
+				newText = conv(std::string((const char*)begin, size));
+
+				output = google::gumbo_parse_with_options(&google::kGumboDefaultOptions, newText.c_str(), newText.length());
+				if (!output)
+					return false;
+			}
+
+			auto success = fromGumbo(container, output->root);
+			google::gumbo_destroy_output(&google::kGumboDefaultOptions, output);
+
+			if (!success)
+				return false;
 
 			auto list = container->childNodes();
 			if (list)
@@ -412,18 +460,13 @@ namespace dom { namespace parsers { namespace html {
 					if (e)
 					{
 						doc->setDocumentElement(e);
-						return;
+						return true;
 					}
 				}
 
 				doc->setFragment(container);
 			}
-		}
-
-		bool supportsChunks() const override { return false; }
-		bool onData(const void* begin, size_t size) override
-		{
-			htmlcxx::HTML::ParserSax::parse((const char*)begin, (const char*)begin + size);
+		
 			return true;
 		}
 

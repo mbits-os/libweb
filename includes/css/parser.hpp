@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 
+namespace dom { namespace parsers { struct OutStream; } }
+
 namespace css {
 	enum class TERM_OP
 	{
@@ -71,6 +73,8 @@ namespace css {
 	using Declarations = std::vector<Declaration>;
 
 	Declarations read_style(const std::string& style);
+
+	void serialize_style(dom::parsers::OutStream& stream, const Declarations& ruleset, const std::string& sep);
 }
 
 #endif // __CSS_PARSER_HPP__

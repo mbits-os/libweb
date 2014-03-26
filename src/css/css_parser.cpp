@@ -24,6 +24,7 @@
 
 #include "pch.h"
 #include <css/parser.hpp>
+#include <dom/parsers/parser.hpp>
 #include <cctype>
 #include <utils.hpp>
 
@@ -448,5 +449,53 @@ namespace css
 		}
 
 		return out;
+	}
+
+	void serialize_style(dom::parsers::OutStream& stream, const css::Term& term, bool first)
+	{
+		switch (term.op)
+		{
+		case css::TERM_OP::NONE: if (!first) std::cout << " "; break;
+		case css::TERM_OP::COMMA: std::cout << ", "; break;
+		case css::TERM_OP::SLASH: std::cout << "/"; break;
+		case css::TERM_OP::EXCLAIM: std::cout << " !"; break;
+		}
+
+		bool fun_first = true;
+		switch (term.type)
+		{
+		default: std::cout << term.value; break;
+		case css::TERM_TYPE::STRING: std::cout << '"' << url::quot_escape(term.value) << '"'; break;
+		case css::TERM_TYPE::HASH: std::cout << '#' << term.value; break;
+		case css::TERM_TYPE::FUNCTION:
+			std::cout << term.value << '(';
+			fun_first = true;
+			for (auto&& arg : term.arguments)
+			{
+				serialize_style(stream, arg, fun_first);
+				fun_first = false;
+			}
+			std::cout << ')';
+			break;
+		}
+	}
+
+	void serialize_style(dom::parsers::OutStream& stream, const Declaration& rule)
+	{
+		stream << rule.name << ':';
+		for (auto&& term : rule.expression)
+			serialize_style(stream, term, false);
+	}
+
+	void serialize_style(dom::parsers::OutStream& stream, const Declarations& ruleset, const std::string& sep)
+	{
+		bool first = true;
+		for (auto&& rule : ruleset)
+		{
+			if (first) first = false;
+			else stream << sep;
+			serialize_style(stream, rule);
+		}
+		std::cout << std::endl;
 	}
 }

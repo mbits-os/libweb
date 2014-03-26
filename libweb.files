@@ -2,6 +2,7 @@ pch.h
 pch.cpp=pch:1
 
 includes/http/http.hpp
+includes/css/parser.hpp
 includes/dom/dom.hpp
 includes/dom/domfwd.hpp
 includes/dom/dom_xpath.hpp
@@ -25,6 +26,7 @@ includes/wiki/wiki.hpp
 src/http/http.cpp
 src/http/curl_http.cpp
 src/http/curl_http.hpp
+src/css/css_parser.cpp
 src/dom/dom.cpp
 src/dom/dom_xpath.cpp
 src/dom/nodes/attribute.hpp

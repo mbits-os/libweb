@@ -285,7 +285,7 @@ namespace css
 		return true;
 	}
 
-	bool readTerm(It& it, It end, Term& term, bool url_allowed);
+	bool readTerm(It& it, It end, Term& term, bool url_allowed, bool in_function);
 
 	bool readFunction(It& it, It end, Term& term, bool url_allowed)
 	{
@@ -295,7 +295,7 @@ namespace css
 		terminals::S(it, end);
 
 		Term arg;
-		while (readTerm(it, end, arg, url_allowed))
+		while (readTerm(it, end, arg, url_allowed, true))
 			term.arguments.push_back(std::move(arg));
 
 		terminals::S(it, end);
@@ -306,7 +306,7 @@ namespace css
 		return true;
 	}
 
-	bool readTerm(It& it, It end, Term& term, bool url_allowed)
+	bool readTerm(It& it, It end, Term& term, bool url_allowed, bool in_function)
 	{
 		if (it == end)
 			return false;
@@ -359,7 +359,7 @@ namespace css
 
 		if (term.type == TERM_TYPE::UNKNOWN)
 		{
-			if (terminals::RECOVERY(it, end, term.value, url_allowed ? ')' : ';'))
+			if (terminals::RECOVERY(it, end, term.value, in_function ? ')' : ';'))
 			{
 				term.type = TERM_TYPE::FAILURE;
 				return true;
@@ -410,7 +410,7 @@ namespace css
 	bool readExpr(It& it, It end, Declaration& decl)
 	{
 		Term term;
-		while (readTerm(it, end, term, false))
+		while (readTerm(it, end, term, false, false))
 		{
 			decl.expression.push_back(std::move(term));
 			if (term.type == TERM_TYPE::FAILURE)
@@ -455,27 +455,27 @@ namespace css
 	{
 		switch (term.op)
 		{
-		case css::TERM_OP::NONE: if (!first) std::cout << " "; break;
-		case css::TERM_OP::COMMA: std::cout << ", "; break;
-		case css::TERM_OP::SLASH: std::cout << "/"; break;
-		case css::TERM_OP::EXCLAIM: std::cout << " !"; break;
+		case css::TERM_OP::NONE: if (!first) stream << " "; break;
+		case css::TERM_OP::COMMA: stream << ", "; break;
+		case css::TERM_OP::SLASH: stream << "/"; break;
+		case css::TERM_OP::EXCLAIM: stream << " !"; break;
 		}
 
 		bool fun_first = true;
 		switch (term.type)
 		{
-		default: std::cout << term.value; break;
-		case css::TERM_TYPE::STRING: std::cout << '"' << url::quot_escape(term.value) << '"'; break;
-		case css::TERM_TYPE::HASH: std::cout << '#' << term.value; break;
+		default: stream << term.value; break;
+		case css::TERM_TYPE::STRING: stream << '"' << url::quot_escape(term.value) << '"'; break;
+		case css::TERM_TYPE::HASH: stream << '#' << term.value; break;
 		case css::TERM_TYPE::FUNCTION:
-			std::cout << term.value << '(';
+			stream << term.value << '(';
 			fun_first = true;
 			for (auto&& arg : term.arguments)
 			{
 				serialize_style(stream, arg, fun_first);
 				fun_first = false;
 			}
-			std::cout << ')';
+			stream << ')';
 			break;
 		}
 	}
@@ -493,9 +493,8 @@ namespace css
 		for (auto&& rule : ruleset)
 		{
 			if (first) first = false;
-			else stream << sep;
+			else stream << ';' << sep;
 			serialize_style(stream, rule);
 		}
-		std::cout << std::endl;
 	}
 }
